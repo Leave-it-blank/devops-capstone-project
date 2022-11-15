@@ -121,7 +121,8 @@ class TestAccountService(TestCase):
             json=account.serialize(),
             content_type="test/html"
         )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(response.status_code,
+                         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
     def test_read_an_account(self):
@@ -130,10 +131,11 @@ class TestAccountService(TestCase):
         res = self.client.get(
             f"{BASE_URL}/{account.id}", content_type="application/json"
         )
-        self.assertEqual(res.status_code , status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         data = res.get_json()
         self.assertEqual(data["name"], account.name)
         self.assertEqual(data["address"], account.address)
+
     def test_account_not_found(self):
         """ It should not read an account that is not found"""
         res = self.client.get(f"{BASE_URL}/0")
@@ -146,28 +148,27 @@ class TestAccountService(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         data = res.get_json()
         self.assertEqual(len(data), 10)
-    
+
     def test_update_account(self):
         """It should Update an existing Account"""
-         # create an Account to update
+        # create an Account to update
         test_account = AccountFactory()
         resp = self.client.post(BASE_URL, json=test_account.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-
         # update the account
         new_account = resp.get_json()
         new_account["name"] = "spiderman"
-        resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
+        resp = self.client.put(
+            f"{BASE_URL}/{new_account['id']}", json=new_account)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_account = resp.get_json()
         self.assertEqual(updated_account["name"], "spiderman")
 
-        #account not found error
+        # account not found error
         resp = self.client.put(f"{BASE_URL}/0", json=new_account)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         resp = self.client.put(f"{BASE_URL}/1", json=new_account)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
 
     def test_method_not_allowed(self):
         """It should not allow an illegal method call"""
@@ -181,6 +182,3 @@ class TestAccountService(TestCase):
         account = self._create_accounts(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{account.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        
-
-        
